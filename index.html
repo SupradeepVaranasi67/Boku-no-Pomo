@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Boku no Pomo</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <div class="container">
+            <h1>Boku no Pomo</h1>
+            
+            <div class="timer-container">
+                <div class="mode-indicator" id="modeDisplay">Work Time</div>
+                <div class="timer-display" id="timer">25:00</div>
+                
+                <!-- Settings are placed above controls because users might adjust before starting -->
+                <div class="settings">
+                    <div class="setting-group">
+                        <label for="workTime">Session </label>
+                        <input type="number" id="workTime" value="25" min="1" max="60">
+                    </div>
+                    <div class="setting-group">
+                        <label for="breakTime">Break</label>
+                        <input type="number" id="breakTime" value="5" min="1" max="30">
+                    </div>
+                </div>
+
+                <!-- Controls for the timer -->
+                <div class="timer-controls">
+                    <button id="startBtn" class="primary-btn">Start</button>
+                    <button id="pauseBtn" class="secondary-btn">Pause</button>
+                    <button id="resetBtn" class="secondary-btn">Reset</button>
+                </div>
+            </div>
+            
+            <div class="tasks">
+                <h2>Tasks</h2>
+                <div class="task-input">
+                    <input type="text" id="taskInput" placeholder="Add a new task...">
+                    <button id="addTaskBtn" class="secondary-btn" onclick="addTask()">➕ Add</button>
+                </div>
+                <div class="task-list" id="taskList"></div>
+            </div>
+        </div>
+        
+        <script src="script.js"></script>
+    </body>
+</html>
