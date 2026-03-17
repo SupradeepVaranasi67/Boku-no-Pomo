@@ -1,9 +1,8 @@
-// Timer state variables
 let timeRemaining;
 let timerId = null;
-let currentMode = 'work'; // 'work' or 'break'
+let currentMode = 'work';
 
-// Get UI elements
+// UI elements
 const timer = document.getElementById('timer');
 const modeDisplay = document.getElementById('modeDisplay');
 const startBtn = document.getElementById('startBtn');
@@ -14,44 +13,46 @@ const breakTimeInput = document.getElementById('breakTime');
 const taskInput = document.getElementById('taskInput');
 const taskList = document.getElementById('taskList');
 
-// Initialize timer
+// Init
 function initTimer() {
-    timeRemaining = workTimeInput.value * 60;
-    updateTimerDisplay();
+    timeRemaining = Number(workTimeInput.value) * 60;
+    updateDisplay();
 }
 
-// Update timer display
-function updateTimerDisplay() {
-    const minutes = Math.floor(timeRemaining / 60);
-    const seconds = timeRemaining % 60;
-    timer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+// Display
+function updateDisplay() {
+    const min = Math.floor(timeRemaining / 60);
+    const sec = timeRemaining % 60;
+    timer.textContent =
+        `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
 }
 
-// Start timer
+// Start
 function startTimer() {
-    if (timerId !== null) return;
+    if (timerId) return;
+
     timerId = setInterval(() => {
         if (timeRemaining > 0) {
             timeRemaining--;
-            updateTimerDisplay();
+            updateDisplay();
         } else {
             clearInterval(timerId);
             timerId = null;
-            playNotification();
             switchMode();
         }
     }, 1000);
+
     startBtn.disabled = true;
 }
 
-// Pause timer
+// Pause
 function pauseTimer() {
     clearInterval(timerId);
     timerId = null;
     startBtn.disabled = false;
 }
 
-// Reset timer
+// Reset
 function resetTimer() {
     pauseTimer();
     currentMode = 'work';
@@ -62,33 +63,67 @@ function resetTimer() {
 // Switch mode
 function switchMode() {
     currentMode = currentMode === 'work' ? 'break' : 'work';
-    timeRemaining = (currentMode === 'work' ? workTimeInput.value : breakTimeInput.value) * 60;
-    modeDisplay.textContent = currentMode === 'work' ? 'Work Time' : 'Break Time';
-    updateTimerDisplay();
+
+    timeRemaining =
+        Number(currentMode === 'work'
+            ? workTimeInput.value
+            : breakTimeInput.value) * 60;
+
+    modeDisplay.textContent =
+        currentMode === 'work' ? 'Work Time' : 'Break Time';
+
+    updateDisplay();
     startTimer();
 }
 
-// Play notification
-function playNotification() {
-    new Audio('https://www.soundjay.com/button/beep-07.wav').play();
+// Input change
+function handleTimeChange() {
+    if (timerId) return;
+
+    timeRemaining =
+        Number(currentMode === 'work'
+            ? workTimeInput.value
+            : breakTimeInput.value) * 60;
+
+    updateDisplay();
 }
 
 // Add task
 function addTask() {
-    const taskText = taskInput.value.trim();
-    if (!taskText) return;
-    const taskItem = document.createElement('div');
-    taskItem.className = 'task-item';
-    taskItem.innerHTML = `<input type="checkbox" class="task-checkbox"><span>${taskText}</span>`;
-    taskList.appendChild(taskItem);
+    const text = taskInput.value.trim();
+    if (!text) return;
+
+    const item = document.createElement('div');
+    item.className = 'task-item';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+
+    const span = document.createElement('span');
+    span.textContent = text;
+
+    checkbox.addEventListener('change', () => {
+        item.classList.toggle('completed');
+    });
+
+    item.appendChild(checkbox);
+    item.appendChild(span);
+    taskList.appendChild(item);
+
     taskInput.value = '';
 }
 
-// Event Listeners
+// Events
 startBtn.addEventListener('click', startTimer);
 pauseBtn.addEventListener('click', pauseTimer);
 resetBtn.addEventListener('click', resetTimer);
-taskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTask(); });
 
-// Initialize
+workTimeInput.addEventListener('input', handleTimeChange);
+breakTimeInput.addEventListener('input', handleTimeChange);
+
+taskInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addTask();
+});
+
+// Init
 initTimer();
