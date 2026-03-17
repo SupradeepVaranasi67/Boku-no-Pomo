@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pomo-timer
+spec:
+  type: LoadBalancer
+  selector:
+    app: pomo-timer
+  ports:
+    - port: 80
+      targetPort: 80

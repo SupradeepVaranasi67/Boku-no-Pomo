@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pomo-timer
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pomo-timer
+  template:
+    metadata:
+      labels:
+        app: pomo-timer
+    spec:
+      containers:
+      - name: pomo-timer
+        image: gcr.io/gcp-demo-project-487205/pomo-timer
+        ports:
+        - containerPort: 80
