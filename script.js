@@ -1,33 +1,46 @@
 let timeRemaining;
 let timerId = null;
 let currentMode = 'work';
+let totalTime = 0;
 
-// UI elements
+// UI
 const timer = document.getElementById('timer');
 const modeDisplay = document.getElementById('modeDisplay');
-const startBtn = document.getElementById('startBtn');
-const pauseBtn = document.getElementById('pauseBtn');
-const resetBtn = document.getElementById('resetBtn');
 const workTimeInput = document.getElementById('workTime');
 const breakTimeInput = document.getElementById('breakTime');
 const taskInput = document.getElementById('taskInput');
 const taskList = document.getElementById('taskList');
+const themeToggle = document.getElementById('themeToggle');
 
-// Init
+// progress ring
+const circle = document.querySelector('.progress-ring-circle');
+const radius = 90;
+const circumference = 2 * Math.PI * radius;
+
+circle.style.strokeDasharray = circumference;
+circle.style.strokeDashoffset = circumference;
+
+// init
 function initTimer() {
-    timeRemaining = Number(workTimeInput.value) * 60;
+    totalTime = workTimeInput.value * 60;
+    timeRemaining = totalTime;
     updateDisplay();
+    updateProgress();
 }
 
-// Display
 function updateDisplay() {
-    const min = Math.floor(timeRemaining / 60);
-    const sec = timeRemaining % 60;
-    timer.textContent =
-        `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    const m = Math.floor(timeRemaining / 60);
+    const s = timeRemaining % 60;
+    timer.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
-// Start
+function updateProgress() {
+    const percent = timeRemaining / totalTime;
+    const offset = circumference - percent * circumference;
+    circle.style.strokeDashoffset = offset;
+}
+
+// start
 function startTimer() {
     if (timerId) return;
 
@@ -35,24 +48,22 @@ function startTimer() {
         if (timeRemaining > 0) {
             timeRemaining--;
             updateDisplay();
+            updateProgress();
         } else {
             clearInterval(timerId);
             timerId = null;
             switchMode();
         }
     }, 1000);
-
-    startBtn.disabled = true;
 }
 
-// Pause
+// pause
 function pauseTimer() {
     clearInterval(timerId);
     timerId = null;
-    startBtn.disabled = false;
 }
 
-// Reset
+// reset
 function resetTimer() {
     pauseTimer();
     currentMode = 'work';
@@ -60,35 +71,32 @@ function resetTimer() {
     initTimer();
 }
 
-// Switch mode
+// switch
 function switchMode() {
     currentMode = currentMode === 'work' ? 'break' : 'work';
 
-    timeRemaining =
-        Number(currentMode === 'work'
-            ? workTimeInput.value
-            : breakTimeInput.value) * 60;
+    totalTime = (currentMode === 'work' ? workTimeInput.value : breakTimeInput.value) * 60;
+    timeRemaining = totalTime;
 
-    modeDisplay.textContent =
-        currentMode === 'work' ? 'Work Time' : 'Break Time';
+    modeDisplay.textContent = currentMode === 'work' ? 'Work Time' : 'Break Time';
 
     updateDisplay();
+    updateProgress();
     startTimer();
 }
 
-// Input change
+// input change
 function handleTimeChange() {
     if (timerId) return;
 
-    timeRemaining =
-        Number(currentMode === 'work'
-            ? workTimeInput.value
-            : breakTimeInput.value) * 60;
+    totalTime = (currentMode === 'work' ? workTimeInput.value : breakTimeInput.value) * 60;
+    timeRemaining = totalTime;
 
     updateDisplay();
+    updateProgress();
 }
 
-// Add task
+// tasks
 function addTask() {
     const text = taskInput.value.trim();
     if (!text) return;
@@ -96,34 +104,39 @@ function addTask() {
     const item = document.createElement('div');
     item.className = 'task-item';
 
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
+    const check = document.createElement('input');
+    check.type = 'checkbox';
 
     const span = document.createElement('span');
     span.textContent = text;
 
-    checkbox.addEventListener('change', () => {
+    check.addEventListener('change', () => {
         item.classList.toggle('completed');
     });
 
-    item.appendChild(checkbox);
+    item.appendChild(check);
     item.appendChild(span);
     taskList.appendChild(item);
 
     taskInput.value = '';
 }
 
-// Events
-startBtn.addEventListener('click', startTimer);
-pauseBtn.addEventListener('click', pauseTimer);
-resetBtn.addEventListener('click', resetTimer);
+// theme toggle
+themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light');
+});
+
+// events
+document.getElementById('startBtn').onclick = startTimer;
+document.getElementById('pauseBtn').onclick = pauseTimer;
+document.getElementById('resetBtn').onclick = resetTimer;
 
 workTimeInput.addEventListener('input', handleTimeChange);
 breakTimeInput.addEventListener('input', handleTimeChange);
 
-taskInput.addEventListener('keypress', (e) => {
+taskInput.addEventListener('keypress', e => {
     if (e.key === 'Enter') addTask();
 });
 
-// Init
+// init
 initTimer();

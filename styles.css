@@ -1,74 +1,119 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+:root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #e2e8f0;
+    --accent: #ef4444;
+    --secondary: #334155;
+    --task: #334155;
+}
+
+.light {
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --text: #0f172a;
+    --accent: #ef4444;
+    --secondary: #cbd5f5;
+    --task: #e2e8f0;
 }
 
 body {
     font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: #e2e8f0;
+    background: var(--bg);
+    color: var(--text);
     display: flex;
     justify-content: center;
-    padding: 40px 20px;
+    align-items: center;
+    min-height: 100vh;
 }
 
+/* layout */
 .container {
-    width: 360px;
+    width: 380px;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-weight: 600;
+/* top bar */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
 }
 
+#themeToggle {
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* cards */
 .card {
-    background: #1e293b;
+    background: var(--card);
     padding: 20px;
     border-radius: 16px;
     margin-bottom: 20px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* timer */
+.timer-wrapper {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin: 0 auto;
+}
+
+.timer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    font-weight: bold;
 }
 
 .mode {
     text-align: center;
-    opacity: 0.7;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 
-.timer {
-    font-size: 52px;
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 15px;
+/* SVG ring */
+.progress-ring {
+    transform: rotate(-90deg);
 }
 
+.progress-bg {
+    fill: none;
+    stroke: var(--secondary);
+    stroke-width: 10;
+}
+
+.progress-ring-circle {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 10;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s linear;
+}
+
+/* settings */
 .settings {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 15px;
-}
-
-.settings label {
-    font-size: 12px;
-    opacity: 0.7;
+    margin-top: 15px;
 }
 
 .settings input {
     width: 70px;
     padding: 8px;
-    margin-top: 5px;
     border-radius: 8px;
     border: none;
-    background: #0f172a;
-    color: white;
     text-align: center;
 }
 
+/* buttons */
 .controls {
     display: flex;
-    justify-content: space-between;
+    margin-top: 10px;
 }
 
 button {
@@ -78,28 +123,16 @@ button {
     border-radius: 10px;
     border: none;
     cursor: pointer;
-    transition: 0.2s;
-    background: #334155;
-    color: white;
-}
-
-button:hover {
-    transform: translateY(-2px);
-    background: #475569;
+    background: var(--secondary);
+    color: var(--text);
 }
 
 .primary {
-    background: #ef4444;
+    background: var(--accent);
+    color: white;
 }
 
-.primary:hover {
-    background: #dc2626;
-}
-
-.tasks h2 {
-    margin-bottom: 10px;
-}
-
+/* tasks */
 .task-input {
     display: flex;
     gap: 8px;
@@ -111,48 +144,28 @@ button:hover {
     padding: 10px;
     border-radius: 10px;
     border: none;
-    background: #0f172a;
-    color: white;
-}
-
-.task-input button {
-    width: 45px;
-    font-size: 18px;
-    background: #22c55e;
-}
-
-.task-input button:hover {
-    background: #16a34a;
-}
-
-#taskList {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
 }
 
 .task-item {
     display: flex;
-    align-items: center;
     gap: 10px;
     padding: 10px;
-    background: #334155;
+    background: var(--task);
     border-radius: 10px;
-    transition: 0.2s;
+    margin-bottom: 8px;
 }
 
-.task-item:hover {
-    transform: scale(1.02);
+/* strike effect */
+.task-item span {
+    position: relative;
 }
 
-.task-item input {
-    cursor: pointer;
-}
-
-.task-item.completed {
-    opacity: 0.5;
-}
-
-.task-item.completed span {
-    text-decoration: line-through;
+.task-item.completed span::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 2px;
+    width: 100%;
+    background: gray;
 }
