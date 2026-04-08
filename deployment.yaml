@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: pomo-timer
-        image: gcr.io/gcp-demo-project-487205/pomo-timer:db9693d71b26c8af677c82cf2e5b56a80a495667
+        image: gcr.io/gcp-demo-project-487205/pomo-timer:3a42a35832b66cece4e99337de9224a137197e0d
         ports:
         - containerPort: 80
