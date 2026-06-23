@@ -2,18 +2,34 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pomo-timer
+  namespace: default
+  labels:
+    app: pomo-timer
 spec:
   replicas: 3
   selector:
     matchLabels:
       app: pomo-timer
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
   template:
     metadata:
       labels:
         app: pomo-timer
     spec:
       containers:
-      - name: pomo-timer
-        image: gcr.io/gcp-demo-project-487205/pomo-timer:3a42a35832b66cece4e99337de9224a137197e0d
-        ports:
-        - containerPort: 80
+        - name: pomo-timer
+          image: us-central1-docker.pkg.dev/supra-demo-11/gke-cicd-repo/pomo-timer:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "128Mi"
