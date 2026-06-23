@@ -27,7 +27,7 @@ jobs:
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Configure Docker
+      - name: Configure Docker for Artifact Registry
         run: |
           gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
 
@@ -47,7 +47,7 @@ jobs:
             --zone ${{ secrets.GKE_ZONE }} \
             --project ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Deploy new image
+      - name: Deploy new image to GKE
         run: |
           kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=$IMAGE_URI
           kubectl rollout status deployment/${DEPLOYMENT_NAME}
