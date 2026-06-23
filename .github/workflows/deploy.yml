@@ -1,53 +1,32 @@
-name: Build and Deploy Pomo Timer to GKE
+name: Deploy Pomo Timer
 
 on:
   push:
-    branches:
-      - main
-
-env:
-  IMAGE_NAME: pomo-timer
-  DEPLOYMENT_NAME: pomo-timer
-  CONTAINER_NAME: pomo-timer
-  GAR_REPO: gke-cicd-repo
+    branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+      - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Set up gcloud
-        uses: google-github-actions/setup-gcloud@v2
+      - uses: google-github-actions/setup-gcloud@v2
 
-      - name: Configure Docker for Artifact Registry
+      - name: Build and push image
         run: |
-          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          IMAGE="us-central1-docker.pkg.dev/supra-demo-11/gke-cicd-repo/pomo-timer:${{ github.sha }}"
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
-      - name: Build Docker image
+      - name: Deploy to GKE
         run: |
-          IMAGE_URI="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${GAR_REPO}/${IMAGE_NAME}:${{ github.sha }}"
-          docker build -t "$IMAGE_URI" .
-          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
-
-      - name: Push Docker image
-        run: |
-          docker push "$IMAGE_URI"
-
-      - name: Connect to GKE
-        run: |
-          gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} \
-            --zone ${{ secrets.GKE_ZONE }} \
-            --project ${{ secrets.GCP_PROJECT_ID }}
-
-      - name: Deploy new image to GKE
-        run: |
-          kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=$IMAGE_URI
-          kubectl rollout status deployment/${DEPLOYMENT_NAME}
+          gcloud container clusters get-credentials gke-demo-lab --zone us-central1-a --project supra-demo-11
+          kubectl set image deployment/pomo-timer pomo-timer=$IMAGE
+          kubectl rollout status deployment/pomo-timer
